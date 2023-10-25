@@ -1,4 +1,4 @@
-FLAGS= -Wall -lm
+FLAGS= -Wall -lm -fopenmp
 
 det: det.c funciones.o
 	gcc $(FLAGS) -o det det.c funciones.o

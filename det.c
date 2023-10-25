@@ -1,29 +1,34 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <getopt.h>
+#include <omp.h>
 #include "funciones.h"
 
 
 
+
 int main(int argc, char *argv[]){
-    char* nombre1,*nombre2,*nombre3;
+    char* nombre,*tam,*hebras;
     int c = 1;
     int b=1;
     int a=1;
+    int N;
     int option;
+    int det = 0;
     float** matrix;
     while((option = getopt(argc, argv, "i:N:H:d")) != -1){
         switch(option){
             case 'i':
-                nombre1 = optarg;
+                nombre = optarg;
                 b=0;
                 break;
             case 'N':
-                nombre2 = optarg;
+                tam = optarg;
+                N=atoi(tam);
                 a=0;
                 break;
             case 'H':
-                nombre3= optarg;
+                hebras= optarg;
                 c = 0;
                 break;
             case 'd':
@@ -37,15 +42,22 @@ int main(int argc, char *argv[]){
 
     }
     else {
-        printf("nombre %s, tamaño %s,hebras %s \n",nombre1,nombre2,nombre3);
-        matrix=leerMatriz(nombre1,nombre2);
+        printf("nombre %s, tamaño %s,hebras %s \n",nombre,tam,hebras);
+        matrix=leerMatriz(nombre,tam);
         if (matrix==NULL)
         {
             printf("\n");
         }
         else{
-            verMatrix(matrix,nombre2);
-            liberarMatrix(matrix,nombre2);
+            verMatrix(matrix,tam);
+            //det=parallel_det(matrix,N,atoi(hebras),0,N);
+            //det=determinant(matrix,N);
+            size_t  a=sizeof(matrix)*N*N;
+            printf("el determinante es: %d",a);
+            
+          
+
+            liberarMatrix(matrix,tam);
         }
         
     
