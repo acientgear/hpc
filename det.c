@@ -53,12 +53,12 @@ int main(int argc, char *argv[]){
         // deshabilitar paralelismo anidado
         omp_set_nested(0);
         double result = determinantLaplace(matrix, N);
-        printf("Determinante: %lf\n", result);
+        printf("Determinante: %4.e\n", result);
         // Liberar memoria
         liberarMatrix(matrix,N);
         end = clock(); // Registra el tiempo de finalización
         cpu_time_used = ((double)(end - start)) / CLOCKS_PER_SEC;
-        printf("Tiempo de ejecución: %4.e segundos\n", cpu_time_used);
+        printf("Tiempo de ejecución: %lf segundos\n", cpu_time_used);
         return 0;
     }
 }
