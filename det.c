@@ -3,12 +3,14 @@
 #include <getopt.h>
 #include <omp.h>
 #include "funciones.h"
+#include <time.h>
 
 double determinantLaplace(double **matrix, int size);
 void ijMinor(double **matrix, double **minorMatrix, int size, int row, int column);
 
 int main(int argc, char *argv[]){
-
+    clock_t start, end;
+    double cpu_time_used;
     char *nombreArchivo;
     int c = 1;
     int b = 1;
@@ -37,12 +39,13 @@ int main(int argc, char *argv[]){
         }
     }
 
-    if (a == 1 || b == 1 || c == 1)
+    if (a == 1 || b == 1 || c == 1 || hebras <= 0)
     {
         printf("flag invalida\n");
     }
 
     else{
+        start = clock(); // Registra el tiempo de inicio
         // leer matriz
         matrix = leerMatriz(nombreArchivo, N);
         // definir numero de hebras
@@ -52,50 +55,11 @@ int main(int argc, char *argv[]){
         double result = determinantLaplace(matrix, N);
         printf("Determinante: %lf\n", result);
         // Liberar memoria
-        for (int i = 0; i < N; i++){
-            free(matrix[i]);
-        }
-        free(matrix);
+        liberarMatrix(matrix,N);
+        end = clock(); // Registra el tiempo de finalización
+        cpu_time_used = ((double)(end - start)) / CLOCKS_PER_SEC;
+        printf("Tiempo de ejecución: %4.e segundos\n", cpu_time_used);
         return 0;
     }
 }
 
-double determinantLaplace(double **matrix, int size) {
-    if (size == 1) return matrix[0][0];
-    double result = 0;
-
-    #pragma omp parallel for default(none) shared(size, matrix) reduction(+ : result)
-    for (int j = 0; j < size; j++) {
-        int sign = (j % 2) ? -1 : 1;
-        double **minorMatrix = (double **)malloc((size - 1) * sizeof(double *));
-        for (int k = 0; k < size - 1; k++) {
-            minorMatrix[k] = (double *)malloc((size - 1) * sizeof(double));
-        }
-
-        ijMinor(matrix, minorMatrix, size, 0, j);
-
-        result += sign * matrix[0][j] * determinantLaplace(minorMatrix, size - 1);
-
-        for (int i = 0; i < size - 1; i++) {
-            free(minorMatrix[i]);
-        }
-        free(minorMatrix);
-    }
-    return result;
-}
-
-
-void ijMinor(double **matrix, double **minorMatrix, int size, int row, int column) {
-    int minorRow = 0;
-    for (int i = 0; i < size; i++) {
-        if (i == row) continue;
-        
-        int minorCol = 0;
-        for (int j = 0; j < size; j++) {
-            if (j == column) continue;
-            minorMatrix[minorRow][minorCol] = matrix[i][j];
-            minorCol++;
-        }
-        minorRow++;
-    }
-}
